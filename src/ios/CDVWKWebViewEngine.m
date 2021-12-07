@@ -708,6 +708,12 @@
 
 - (void)webViewWebContentProcessDidTerminate:(WKWebView *)webView
 {
+    // Similarly to setServerBasePath we are utilizing cdv local server
+    // Needed to handle WebProcessProxy::processDidTerminateOrFailedToLaunch: reason=3
+    // Fix for SAN-11422 
+    NSURL *url = [NSURL URLWithString:self.CDV_LOCAL_SERVER];
+    NSURLRequest *request = [NSURLRequest requestWithURL: url];
+    [webView loadRequest:request];
     [webView reload];
 }
 
