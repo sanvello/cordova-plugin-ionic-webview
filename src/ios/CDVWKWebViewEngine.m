@@ -275,6 +275,21 @@
     // add to keyWindow to ensure it is 'active'
     [UIApplication.sharedApplication.keyWindow addSubview:self.engineWebView];
 
+    #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 160400
+        // With the introduction of iOS 16.4 the webview is no longer inspectable by default.
+        // We'll honor that change for release builds, but will still allow inspection on debug builds by default.
+        // We also introduce an override option, so consumers can influence this decision in their own build.
+        if (@available(iOS 16.4, *)) {
+            #ifdef DEBUG
+                BOOL allowWebviewInspectionDefault = YES;
+            #else
+                BOOL allowWebviewInspectionDefault = NO;
+            #endif
+
+            wkWebView.inspectable = [settings cordovaBoolSettingForKey:@"InspectableWebview" defaultValue:allowWebviewInspectionDefault];
+        }
+    #endif
+
     NSString * overrideUserAgent = [settings cordovaSettingForKey:@"OverrideUserAgent"];
     if (overrideUserAgent != nil) {
         wkWebView.customUserAgent = overrideUserAgent;
